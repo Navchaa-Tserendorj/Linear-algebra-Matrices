@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Шугаман алгебр - Интерактив цахим лекц</title>
+  
+  <!-- Ruffle Flash эмуляторын сан (CDN) -->
+  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      height: 100vh;
+      background-color: #0f172a;
+      color: #333;
+    }
+
+    /* Хажуугийн цэс */
+    .sidebar {
+      width: 340px;
+      background-color: #1e293b;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    .sidebar-header {
+      padding: 20px;
+      background-color: #0f172a;
+      border-bottom: 1px solid #334155;
+    }
+    .sidebar-header h2 {
+      font-size: 1.2rem;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .sidebar-header p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+    .topic-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding: 10px 0;
+    }
+    .topic-item {
+      padding: 14px 20px;
+      cursor: pointer;
+      border-left: 4px solid transparent;
+      transition: all 0.2s ease;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.4;
+    }
+    .topic-item:hover {
+      background-color: #334155;
+      color: #38bdf8;
+    }
+    .topic-item.active {
+      background-color: #334155;
+      border-left-color: #38bdf8;
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    /* Үндсэн тоглуулагч хэсэг */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #0f172a;
+    }
+    .content-header {
+      background-color: #1e293b;
+      padding: 16px 25px;
+      border-bottom: 1px solid #334155;
+      color: #f8fafc;
+    }
+    .content-header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .player-container {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #flash-player {
+      width: 100%;
+      height: 100%;
+      max-width: 1024px;
+      max-height: 768px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background-color: #000;
+    }
+    .footer-info {
+      padding: 12px 25px;
+      background-color: #1e293b;
+      border-top: 1px solid #334155;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Хажуугийн цэс: Лекцийн 8 сэдэв -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>Шугаман алгебр</h2>
+      <p>Интерактив цахим лекцийн хэрэглэгдэхүүн</p>
+    </div>
+    <ul class="topic-list" id="topic-list">
+      <li class="topic-item active" data-swf="swf/1_1_matrices.swf" onclick="loadSwf(this, '1.1. Матриц, үндсэн элементүүд')">
+        1.1. Матриц, үндсэн элементүүд
+      </li>
+      <li class="topic-item" data-swf="swf/1_2_linear_operations.swf" onclick="loadSwf(this, '1.2. Матриц дээр хийх шугаман үйлдэл')">
+        1.2. Матриц дээр хийх шугаман үйлдэл
+      </li>
+      <li class="topic-item" data-swf="swf/1_3_multiplication.swf" onclick="loadSwf(this, '1.3. Матрицуудыг үржих')">
+        1.3. Матрицуудыг үржих
+      </li>
+      <li class="topic-item" data-swf="swf/1_4_transposition.swf" onclick="loadSwf(this, '1.4. Матрицийг хөрвүүлэх')">
+        1.4. Матрицийг хөрвүүлэх
+      </li>
+      <li class="topic-item" data-swf="swf/1_5_determinants.swf" onclick="loadSwf(this, '1.5. Тодорхойлогч')">
+        1.5. Тодорхойлогч
+      </li>
+      <li class="topic-item" data-swf="swf/1_6_solving_determinants.swf" onclick="loadSwf(this, '1.6. Тодорхойлогчийг бодох')">
+        1.6. Тодорхойлогчийг бодох
+      </li>
+      <li class="topic-item" data-swf="swf/1_7_inverse_matrix.swf" onclick="loadSwf(this, '1.7. Урвуу матриц, матрицийн ранг')">
+        1.7. Урвуу матриц, матрицийн ранг
+      </li>
+      <li class="topic-item" data-swf="swf/1_8_elementary_transformations.swf" onclick="loadSwf(this, '1.8. Эгэл хувиргалт')">
+        1.8. Эгэл хувиргалт
+      </li>
+    </ul>
+  </div>
+
+  <!-- Үндсэн үзүүлэх хэсэг -->
+  <div class="main-content">
+    <div class="content-header">
+      <h1 id="current-title">1.1. Матриц, үндсэн элементүүд</h1>
+    </div>
+
+    <div class="player-container">
+      <div id="flash-player"></div>
+    </div>
+
+    <div class="footer-info">
+      МУИС - Шугаман алгебрын цахим хичээлийн хэрэглэгдэхүүн | Ruffle эмулятор ашиглав
+    </div>
+  </div>
+
+  <script>
+    // SWF файл ачаалах функц
+    function loadSwf(element, title) {
+      // Идэвхтэй цэсийн стилийг солих
+      const items = document.querySelectorAll('.topic-item');
+      items.forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
+
+      // Гарчиг шинэчлэх
+      document.getElementById('current-title').textContent = title;
+
+      const swfUrl = element.getAttribute('data-swf');
+      const container = document.getElementById('flash-player');
+      container.innerHTML = ''; // Өмнөх тоглуулагчийг цэвэрлэх
+
+      // Ruffle тоглуулагч үүсгэх
+      window.RufflePlayer = window.RufflePlayer || {};
+      const ruffle = window.RufflePlayer.newest();
+      const player = ruffle.createPlayer();
+      
+      player.style.width = "100%";
+      player.style.height = "100%";
+      container.appendChild(player);
+
+      // SWF файлыг ачаалах
+      player.load(swfUrl);
+    }
+
+    // Хуудас ачаалагдахад эхний сэдвийг тоглуулах
+    window.addEventListener('DOMContentLoaded', () => {
+      const firstItem = document.querySelector('.topic-item.active');
+      if (firstItem) {
+        loadSwf(firstItem, '1.1. Матриц, үндсэн элементүүд');
+      }
+    });
+  </script>
+</body>
+</html>
